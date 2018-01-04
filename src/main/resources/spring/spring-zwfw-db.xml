@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+	http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+	<bean id="mysqlDialect" class="com.safetys.zwfw.dialect.MySqlDialect" />
+	<bean id="oracleDialect" class="com.safetys.zwfw.dialect.OracleDialect" />
+	
+	<!-- 政务服务（安监局前置机） -->
+	<bean id="zwfwDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"/>
+		<property name="jdbcUrl" value="${zwfw.jdbc.url}"/>
+		<property name="user" value="${zwfw.jdbc.username}"/>
+		<property name="password" value="${zwfw.jdbc.password}"/>
+		<!-- 注意加入此设置，防止mysql 8小时限制 -->
+		<property name="maxIdleTime" value="1800"/>
+	</bean>
+
+	<bean id="zwfwJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="zwfwDataSource" />
+	</bean>
+	
+	<!-- 上行操作数据 办件数据上传 begin -->
+	<!-- 源：执法数据库-->
+	<bean id="uplinkSourceDB" class="com.safetys.zwfw.service.domain.impl.SourceDBTemplateImpl">
+	    <property name="jdbcTemplate" ref="sxsJdbcTemplate"></property>
+	    <property name="dialect" ref="oracleDialect"></property>
+	</bean>
+	<!-- 目标：安监局前置-->
+	<bean id="uplinkTargetDB" class="com.safetys.zwfw.service.domain.impl.TargetDBTemplateImpl">
+	    <property name="jdbcTemplate" ref="zwfwJdbcTemplate"></property>
+	</bean>
+	<bean id="uplinkDefinitionManager" class="com.safetys.zwfw.core.TableDefinitionManager">
+	    <property name="interfaceClass" value="com.safetys.zwfw.core.IUplinkDefinition"></property>
+	</bean>
+	<!-- 上行同步执行类 -->
+	<bean id="uplinkSynchroService" class="com.safetys.zwfw.service.domain.impl.DataSynchroServiceImpl">
+	    <property name="sourceDB" ref="uplinkSourceDB" />
+	    <property name="targetDB" ref="uplinkTargetDB" />
+	    <property name="definitionManager" ref="uplinkDefinitionManager"></property>
+	</bean>
+	<!-- 上行操作数据 办件数据上传 end -->
+	
+</beans>

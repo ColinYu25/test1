@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+	http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<!-- 上行数据 begin -->
+	<bean id="uplinkParentBean" abstract="true">
+        <property name="statusColumn" value="SYNCHRO_STATUS" />
+        <property name="statusWait" value="N" />
+        <property name="statusSuccess" value="Y" />
+        <property name="statusFailure" value="E" />
+        <property name="statusTimeColumn" value="SYNCHRO_TIME" />
+        <property name="compositeKey" value="CASE_ID" />
+        <property name="bufferSize" value="50" /><!-- 缓存条数(默认50条) -->
+        <property name="orderby" value="CREATE_TIME ASC" />
+    </bean>
+    <!-- 松香水数据 -->
+	<bean id="qzj_salerecord_sxs" class="com.safetys.zwfw.bean.UplinkDefinition" parent="uplinkParentBean">
+	    <property name="tableName" value="QZJ_SALERECORD_SXS"/>
+	    <property name="columns" value="CASE_ID,STORE_NAME,BUSINESS_ADDRESS,BUSINESS_REG_NUM,PRINCIPAL_PERSON,PRINCIPAL_TELEPHONE,CREDENTIALS,CREDENTIALS_CODE,NAME,ADDRESS,COMPANY_NAME,PHONE,PRODUCT_NAME,PRODUCT_NUMBER,PAY_TIME,CREATE_TIME,MODIFY_TIME,IS_DELETED,SYNCHRO_STATUS,SYNCHRO_TIME,OPERATE_STATUS"/>
+	</bean>
+	<!-- 烟花爆竹 -->
+	<bean id="qzj_salerecord_firework" class="com.safetys.zwfw.bean.UplinkDefinition" parent="uplinkParentBean">
+	    <property name="tableName" value="QZJ_SALERECORD_FIREWORK"/>
+	    <property name="columns" value="CASE_ID,STORE_NAME,BUSINESS_ADDRESS,BUSINESS_REG_NUM,PRINCIPAL_PERSON,PRINCIPAL_TELEPHONE,CREDENTIALS,CREDENTIALS_CODE,NAME,ADDRESS,COMPANY_NAME,PHONE,PRODUCT_NAME,PRODUCT_NUMBER,PRODUCT_CARTONS,PAY_TIME,CREATE_TIME,MODIFY_TIME,IS_DELETED,SYNCHRO_STATUS,SYNCHRO_TIME,OPERATE_STATUS"/>
+	</bean>
+	<!-- 上行数据 end -->
+	
+</beans>
